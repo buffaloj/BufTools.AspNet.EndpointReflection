@@ -18,12 +18,12 @@ namespace BufTools.AspNet.EndpointReflection
         public Verbs Verb { get; set; }
 
         /// <summary>
-        /// Info on the parameters that the endpoint accepts
+        /// Reflection info for the parameters that the endpoint method accepts
         /// </summary>
         public ParameterInfo[] Parameters { get; set; }
 
         /// <summary>
-        /// Info on the method that implements the endpoint 
+        /// Reflection info for the method that implements the endpoint 
         /// </summary>
         public MethodInfo MethodInfo { get; set; }
 
