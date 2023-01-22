@@ -7,14 +7,14 @@ var endpoints = assembly.GetEndpoints();
 
 # Getting Started
 
-1. Grab the assembly that contains endpoints you want to reflect
+1. Grab the assembly that contains endpoints you want to reflect:
 
 ```cs
 var assembly = typeof(SomeClassInYourProject).Assembly;
 ```
 * There are many standard ways to grab the Assembly. This is just one example
 
-2. Get the endpoints
+2. Get the endpoints:
 
 ```cs
 var endpoints = assembly.GetEndpoints();
