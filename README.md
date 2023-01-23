@@ -28,6 +28,6 @@ GetEndpoints returns a collection of HttpEndpoint instances with info describing
 - Verb - The HTTP verb the endpoint acts on
 - Parameters - Reflection info for the parameters that the endpoint method accepts
 - MethodInfo - Reflection info for the method that implements the endpoint 
-- ReturnType - The type the method that handles the endpoint returns
+- ReturnType - The return type of the endpoint method
 - ControllerName - The name of the controller class that contains the endpoint
 - Assembly - The assembly that contains the endpoint method
