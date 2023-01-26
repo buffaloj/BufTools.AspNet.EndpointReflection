@@ -88,13 +88,13 @@ namespace BufTools.AspNet.EndpointReflection
             {
                 var paramName = match.Groups[1].Value;
                 var param = paramInfo.Where(p => p.Name.Equals(paramName, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-                if (param == null)  // TODO: Swap this out for a domain specific exception
+                if (param == null)
                     throw new RouteParamMissingFromMethod($"{paramName} in route '{route}' does not have a parameter in {controllerType.Name}.{methodInfo.Name}");
 
                 var xmlDocs = assembly.LoadXmlDocumentation();
                 var endpointDocs = xmlDocs.GetDocumentation(methodInfo);
-                if (endpointDocs == null)// TODO: Swap this out for a domain specific exception
-                    throw new XmlDocumentationFileNotFound($"XML Documentation not found for the '{controllerType.Name}.{methodInfo.Name}' method");
+                if (endpointDocs == null)
+                    throw new MissingXMLDocumentationForMethod($"XML Documentation not found for the '{controllerType.Name}.{methodInfo.Name}' method");
 
                 var paramDoc = endpointDocs.Params.Where(p => p.Name == paramName).FirstOrDefault();
                 if (paramDoc == null)
@@ -102,7 +102,7 @@ namespace BufTools.AspNet.EndpointReflection
                                                               $"Try:\n <param name=\"{paramName}\" example=\"blah\">");
 
                 if (string.IsNullOrWhiteSpace(paramDoc.Example))
-                    throw new MissingExampleForParam($"The <param ...> XML tag does not have an example value for the '{paramName}' parameter of the '{controllerType.Name}.{methodInfo.Name}' method\n" +
+                    throw new MissingXMLExampleForParam($"The <param ...> XML tag does not have an example value for the '{paramName}' parameter of the '{controllerType.Name}.{methodInfo.Name}' method\n" +
                                                      $"Try:\n <param name=\"{paramName}\" example=\"blah\">");
 
                 route = route.Replace(match.Value, paramDoc.Example);
