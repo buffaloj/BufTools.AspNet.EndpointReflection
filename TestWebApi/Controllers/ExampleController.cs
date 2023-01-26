@@ -138,5 +138,13 @@ namespace Reflectamundo.TestWebApi.Controllers
                 FilterString = filter?.FilterString
             };
         }
+
+        /// <summary>
+        /// A method that is public, but isn't an endpoint
+        /// </summary>
+        public void ANonEndpointMethod()
+        {
+
+        }
     }
 }

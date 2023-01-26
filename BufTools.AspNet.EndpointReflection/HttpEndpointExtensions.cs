@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 namespace BufTools.AspNet.EndpointReflection
@@ -26,7 +27,8 @@ namespace BufTools.AspNet.EndpointReflection
             return assembly.GetTypes()
                 .Where(type => typeof(ControllerBase).IsAssignableFrom(type))
                 .SelectMany(type => type.GetMethods(BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.Public))
-                .Where(m => !m.GetCustomAttributes(typeof(System.Runtime.CompilerServices.CompilerGeneratedAttribute), true).Any())
+                .Where(m => !m.GetCustomAttributes(typeof(CompilerGeneratedAttribute), true).Any() &&
+                            m.GetCustomAttributes(typeof(HttpMethodAttribute), true).Any())
                 .Select(x => new HttpEndpoint
                 {
                     ControllerType = x.DeclaringType,
@@ -103,7 +105,7 @@ namespace BufTools.AspNet.EndpointReflection
 
                 if (string.IsNullOrWhiteSpace(paramDoc.Example))
                     throw new MissingXMLExampleForParam($"The <param ...> XML tag does not have an example value for the '{paramName}' parameter of the '{controllerType.Name}.{methodInfo.Name}' method\n" +
-                                                     $"Try:\n <param name=\"{paramName}\" example=\"blah\">");
+                                                        $"Try:\n <param name=\"{paramName}\" example=\"blah\">");
 
                 route = route.Replace(match.Value, paramDoc.Example);
             }
