@@ -1,10 +1,13 @@
 ﻿using BufTools.AspNet.EndpointReflection.Exceptions;
+using BufTools.AspNet.EndpointReflection.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace BufTools.AspNet.EndpointReflection
 {
@@ -26,25 +29,40 @@ namespace BufTools.AspNet.EndpointReflection
                 .Where(m => !m.GetCustomAttributes(typeof(System.Runtime.CompilerServices.CompilerGeneratedAttribute), true).Any())
                 .Select(x => new HttpEndpoint
                 {
-                    ControllerName = x.DeclaringType.Name,
-                    Route = MakeRoute(
-                        x.DeclaringType.GetCustomAttribute<RouteAttribute>(),
-                        x.GetCustomAttribute<RouteAttribute>(),
-                        x.GetCustomAttribute<HttpGetAttribute>(),
-                        x.GetCustomAttribute<HttpPutAttribute>(),
-                        x.GetCustomAttribute<HttpPostAttribute>(),
-                        x.GetCustomAttribute<HttpDeleteAttribute>(),
-                        x.GetCustomAttribute<HttpPatchAttribute>(),
-                        x.GetCustomAttribute<HttpOptionsAttribute>(),
-                        x.GetCustomAttribute<HttpHeadAttribute>()),
+                    ControllerType = x.DeclaringType,
+                    Route = MakeRoute(x),
+                    ExampleRoute = MakeRouteFromXmlExamples(x),
                     Parameters = x.GetParameters(),
                     MethodInfo = x,
-                    ReturnType = x.ReturnType.Name,
+                    ReturnType = x.ReturnType,
                     Assembly = x.DeclaringType.Assembly,
-                    Verb = GetVerb(x)
+                    Verb = GetVerb(x),
+                    BodyPayloadType = GetPayloadType(x.GetParameters()),
+                    EndpointMethodName = x.Name,
+                    ResponseTypes = GetResponseTypes(x)
                 })
-                .OrderBy(x => x.ControllerName)
+                .OrderBy(x => x.ControllerType.Name)
                 .ThenBy(x => x.MethodInfo.Name);
+        }
+
+        private static IDictionary<HttpStatusCode, Type> GetResponseTypes(MethodInfo info)
+        {
+            return info.GetCustomAttributes<ProducesResponseTypeAttribute>()
+                       .ToDictionary(p => (HttpStatusCode)p.StatusCode, p => p.Type);
+        }
+
+        private static string MakeRoute(MethodInfo info)
+        {
+            return MakeRoute(
+                info.DeclaringType.GetCustomAttribute<RouteAttribute>(),
+                info.GetCustomAttribute<RouteAttribute>(),
+                info.GetCustomAttribute<HttpGetAttribute>(),
+                info.GetCustomAttribute<HttpPutAttribute>(),
+                info.GetCustomAttribute<HttpPostAttribute>(),
+                info.GetCustomAttribute<HttpDeleteAttribute>(),
+                info.GetCustomAttribute<HttpPatchAttribute>(),
+                info.GetCustomAttribute<HttpOptionsAttribute>(),
+                info.GetCustomAttribute<HttpHeadAttribute>());
         }
 
         private static string MakeRoute(params Attribute[] attributes)
@@ -53,6 +71,50 @@ namespace BufTools.AspNet.EndpointReflection
             foreach (var attribute in attributes)
                 route += attribute.Route();
             return route;
+        }
+
+        private static string MakeRouteFromXmlExamples(MethodInfo methodInfo)
+        {
+            var route = MakeRoute(methodInfo);
+            var paramInfo = methodInfo.GetParameters();
+            var assembly = methodInfo.DeclaringType.Assembly;
+            var controllerType = methodInfo.DeclaringType;
+
+            var loadedAssemblies = new HashSet<Assembly>();
+
+            var regex = new Regex("{(.*?)}");
+            var matches = regex.Matches(route);
+            foreach (Match match in matches)
+            {
+                var paramName = match.Groups[1].Value;
+                var param = paramInfo.Where(p => p.Name.Equals(paramName, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                if (param == null)  // TODO: Swap this out for a domain specific exception
+                    throw new RouteParamMissingFromMethod($"{paramName} in route '{route}' does not have a parameter in {controllerType.Name}.{methodInfo.Name}");
+
+                var xmlDocs = assembly.LoadXmlDocumentation();
+                var endpointDocs = xmlDocs.GetDocumentation(methodInfo);
+                if (endpointDocs == null)// TODO: Swap this out for a domain specific exception
+                    throw new XmlDocumentationFileNotFound($"XML Documentation not found for the '{controllerType.Name}.{methodInfo.Name}' method");
+
+                var paramDoc = endpointDocs.Params.Where(p => p.Name == paramName).FirstOrDefault();
+                if (paramDoc == null)
+                    throw new MissingXMLDocumentationForParam($"<param ...> XML tag not found for the '{paramName}' parameter in '{controllerType.Name}.{methodInfo.Name}'" +
+                                                              $"Try:\n <param name=\"{paramName}\" example=\"blah\">");
+
+                if (string.IsNullOrWhiteSpace(paramDoc.Example))
+                    throw new MissingExampleForParam($"The <param ...> XML tag does not have an example value for the '{paramName}' parameter of the '{controllerType.Name}.{methodInfo.Name}' method\n" +
+                                                     $"Try:\n <param name=\"{paramName}\" example=\"blah\">");
+
+                route = route.Replace(match.Value, paramDoc.Example);
+            }
+
+            return route;
+        }
+
+        private static Type GetPayloadType(ParameterInfo[] parameters)
+        {
+            return parameters.Where(p => p.GetCustomAttribute<FromBodyAttribute>() != null)
+                             .Select(p => p.ParameterType).FirstOrDefault();
         }
 
         private static HttpEndpoint.Verbs GetVerb(MethodInfo info)

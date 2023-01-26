@@ -12,26 +12,31 @@ namespace Reflectamundo.TestWebApi.Controllers
     [Route("/api/v1")]
     public class ExampleController : ControllerBase
     {
-        private readonly ILogger<ExampleController> _logger;
-
-        /// <summary>
-        /// Constructs an instance of a Controller
-        /// </summary>
-        /// <param name="logger">A logger instance to log with</param>
-        public ExampleController(ILogger<ExampleController> logger)
-        {
-            _logger = logger;
-        }
-
         /// <summary>
         /// An example of a Get endpoint that will return the filter string
         /// </summary>
         /// <param name="filter">An object used to filter the request</param>
         /// <returns>An <see cref="ExampleResponse"/></returns>
+        [ProducesResponseType(typeof(ExampleResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [HttpGet("example")]
         public IActionResult Get([FromQuery] ExampleFilter filter)
         {
             var response = GetResponse(null, filter);
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// An example of a Get endpoint that returns a resource by id
+        /// </summary>
+        /// <param name="id" example="19">The id of the requested resource</param>
+        /// <returns>An <see cref="ExampleResponse"/></returns>
+        [ProducesResponseType(typeof(ExampleResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [HttpGet("example/{id}")]
+        public IActionResult Get(int id)
+        {
+            var response = new ExampleResponse { ReturnedId = id };
             return Ok(response);
         }
 
@@ -41,6 +46,8 @@ namespace Reflectamundo.TestWebApi.Controllers
         /// <param name="request">A request object</param>
         /// <param name="filter">The object used to filter the request</param>
         /// <returns>An <see cref="ExampleResponse"/></returns>
+        [ProducesResponseType(typeof(ExampleResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [HttpPost("example")]
         public IActionResult Post(ExampleRequest request, [FromQuery] ExampleFilter filter)
         {
@@ -54,6 +61,8 @@ namespace Reflectamundo.TestWebApi.Controllers
         /// <param name="request">A request object</param>
         /// <param name="filter">The object used to filter the request</param>
         /// <returns>An <see cref="ExampleResponse"/></returns>
+        [ProducesResponseType(typeof(ExampleResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [HttpPut("example")]
         public IActionResult Put(ExampleRequest request, [FromQuery] ExampleFilter filter)
         {
@@ -67,6 +76,8 @@ namespace Reflectamundo.TestWebApi.Controllers
         /// <param name="request">A request object</param>
         /// <param name="filter">The object used to filter the request</param>
         /// <returns>An <see cref="ExampleResponse"/></returns>
+        [ProducesResponseType(typeof(ExampleResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [HttpDelete("example")]
         public IActionResult Delete(ExampleRequest request, [FromQuery] ExampleFilter filter)
         {
@@ -80,6 +91,8 @@ namespace Reflectamundo.TestWebApi.Controllers
         /// <param name="request">A request object</param>
         /// <param name="filter">The object used to filter the request</param>
         /// <returns>An <see cref="ExampleResponse"/></returns>
+        [ProducesResponseType(typeof(ExampleResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [HttpPatch("example")]
         public IActionResult Patch(ExampleRequest request, [FromQuery] ExampleFilter filter)
         {
@@ -93,6 +106,8 @@ namespace Reflectamundo.TestWebApi.Controllers
         /// <param name="request">A request object</param>
         /// <param name="filter">The object used to filter the request</param>
         /// <returns>An <see cref="ExampleResponse"/></returns>
+        [ProducesResponseType(typeof(ExampleResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [HttpOptions("example")]
         public IActionResult Options(ExampleRequest request, [FromQuery] ExampleFilter filter)
         {
@@ -106,6 +121,8 @@ namespace Reflectamundo.TestWebApi.Controllers
         /// <param name="request">A request object</param>
         /// <param name="filter">The object used to filter the request</param>
         /// <returns>An <see cref="ExampleResponse"/></returns>
+        [ProducesResponseType(typeof(ExampleResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [HttpOptions("example")]
         public IActionResult Head(ExampleRequest request, [FromQuery] ExampleFilter filter)
         {

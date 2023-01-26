@@ -18,9 +18,18 @@ namespace Reflectamundo.Asp.Tests
         [TestMethod]
         public void GetEndpoints_WithValidAssembly_GetsEndpoints()
         {
-            var endpoints = _assembly.GetEndpoints();
+            var endpoints = _assembly.GetEndpoints().ToList();
 
             Assert.IsNotNull(endpoints);
+            Assert.IsTrue(endpoints.All(e => !string.IsNullOrEmpty(e.Route)));
+            Assert.IsTrue(endpoints.All(e => !string.IsNullOrEmpty(e.ExampleRoute)));
+            Assert.IsTrue(endpoints.All(e => !string.IsNullOrEmpty(e.EndpointMethodName)));
+            Assert.IsTrue(endpoints.All(e => e.Parameters != null));
+            Assert.IsTrue(endpoints.All(e => e.MethodInfo != null));
+            Assert.IsTrue(endpoints.All(e => e.ReturnType != null));
+            Assert.IsTrue(endpoints.All(e => e.ControllerType != null));
+            Assert.IsTrue(endpoints.All(e => e.Assembly != null));
+            Assert.IsTrue(endpoints.All(e => e.ResponseTypes != null && e.ResponseTypes.Any()));
         }
     }
 }
