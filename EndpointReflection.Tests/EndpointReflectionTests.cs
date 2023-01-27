@@ -2,6 +2,7 @@
 using Reflectamundo.TestWebApi.Controllers;
 using System.Reflection;
 using BufTools.AspNet.EndpointReflection;
+using BufTools.AspNet.EndpointReflection.Exceptions;
 
 namespace Reflectamundo.Asp.Tests
 {
@@ -29,7 +30,12 @@ namespace Reflectamundo.Asp.Tests
             Assert.IsTrue(endpoints.All(e => e.ReturnType != null));
             Assert.IsTrue(endpoints.All(e => e.ControllerType != null));
             Assert.IsTrue(endpoints.All(e => e.Assembly != null));
-            Assert.IsTrue(endpoints.All(e => e.ResponseTypes != null && e.ResponseTypes.Any()));
+            Assert.IsTrue(endpoints.Any(e => e.ResponseTypes != null && e.ResponseTypes.Any()));
+            Assert.IsTrue(endpoints.Any(e => e.XmlRouteErrors != null));
+            Assert.IsTrue(endpoints.Any(e => e.XmlRouteErrors != null && e.XmlRouteErrors.Any(err => err is MissingXMLExampleForParam)));
+            Assert.IsTrue(endpoints.Any(e => e.XmlRouteErrors != null && e.XmlRouteErrors.Any(err => err is MissingXMLDocumentationForMethod)));
+            Assert.IsTrue(endpoints.Any(e => e.XmlRouteErrors != null && e.XmlRouteErrors.Any(err => err is MissingXMLExampleForParam)));
+            Assert.IsTrue(endpoints.Any(e => e.XmlRouteErrors != null && e.XmlRouteErrors.Any(err => err is RouteParamMissingFromMethod)));
         }
     }
 }

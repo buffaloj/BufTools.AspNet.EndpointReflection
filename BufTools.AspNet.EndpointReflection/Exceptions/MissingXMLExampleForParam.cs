@@ -1,23 +1,13 @@
 ﻿using System;
-using System.Runtime.Serialization;
+using System.Reflection;
 
 namespace BufTools.AspNet.EndpointReflection.Exceptions
 {
-    public class MissingXMLExampleForParam : Exception
+    public class MissingXMLExampleForParam : Exception, IReportError
     {
-        public MissingXMLExampleForParam()
-        {
-        }
-
-        public MissingXMLExampleForParam(string message) : base(message)
-        {
-        }
-
-        public MissingXMLExampleForParam(string message, Exception innerException) : base(message, innerException)
-        {
-        }
-
-        protected MissingXMLExampleForParam(SerializationInfo info, StreamingContext context) : base(info, context)
+        public MissingXMLExampleForParam(string paramName, MethodInfo methodInfo)
+            : base($"The <param ...> XML tag does not have an example value for the '{paramName}' parameter of the '{methodInfo.DeclaringType.Name}.{methodInfo.Name}' method\n" +
+                   $"Try:\n <param name=\"{paramName}\" example=\"blah\">")
         {
         }
     }

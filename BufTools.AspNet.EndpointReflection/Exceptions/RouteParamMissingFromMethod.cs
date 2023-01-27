@@ -1,24 +1,14 @@
 ﻿using System;
-using System.Runtime.Serialization;
+using System.Reflection;
 
 namespace BufTools.AspNet.EndpointReflection.Exceptions
 {
-    public class RouteParamMissingFromMethod : Exception
+    public class RouteParamMissingFromMethod : Exception, IReportError
     {
-        public RouteParamMissingFromMethod()
+        public RouteParamMissingFromMethod(string paramName, string route, MethodInfo methodInfo) :
+            base($"{paramName} in route '{route}' does not have a parameter in {methodInfo.DeclaringType.Name}.{methodInfo.Name}")
         {
-        }
 
-        public RouteParamMissingFromMethod(string message) : base(message)
-        {
-        }
-
-        public RouteParamMissingFromMethod(string message, Exception innerException) : base(message, innerException)
-        {
-        }
-
-        protected RouteParamMissingFromMethod(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
         }
     }
 }

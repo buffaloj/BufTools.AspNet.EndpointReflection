@@ -142,9 +142,50 @@ namespace Reflectamundo.TestWebApi.Controllers
         /// <summary>
         /// A method that is public, but isn't an endpoint
         /// </summary>
-        public void ANonEndpointMethod()
+        public void APublicNonEndpointMethod()
         {
+        }
+        
+        [HttpHead("example/no_xmldocs_endpoint/{id}")]
+        public IActionResult EndpointWithNoXMLDocs(int id)
+        {
+            var response = new ExampleResponse { ReturnedId = id };
+            return Ok(response);
+        }
+        
+        /// <summary>
+        /// An endpoint with no XML for params
+        /// </summary>
+        /// <returns>A message!</returns>
+        [HttpOptions("example/no_xmldocs_endpoint")]
+        public IActionResult EndpointWithNoParamDocs(ExampleRequest request, [FromQuery] ExampleFilter filter)
+        {
+            var response = GetResponse(request, filter);
+            return Ok(response);
+        }
 
+        /// <summary>
+        /// An endpoint with no XML for params
+        /// </summary>
+        /// <param name="id">A request object</param>
+        /// <returns>A message!</returns>
+        [HttpOptions("example/no_param_example/{id}")]
+        public IActionResult EndpointWithNoParamExample(int id)
+        {
+            var response = new ExampleResponse { ReturnedId = id };
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// An endpoint with missing route param
+        /// </summary>
+        /// <param name="id" example="5">A request object</param>
+        /// <returns>A message!</returns>
+        [HttpOptions("example/missing_route_param/{id}")]
+        public IActionResult EndpointWithNoParamExample()
+        {
+            var response = new ExampleResponse { ReturnedId = 5 };
+            return Ok(response);
         }
     }
 }

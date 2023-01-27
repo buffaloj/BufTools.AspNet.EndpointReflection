@@ -2,6 +2,7 @@
 using BufTools.AspNet.EndpointReflection.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.Routing.Constraints;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,12 +29,13 @@ namespace BufTools.AspNet.EndpointReflection
                 .Where(type => typeof(ControllerBase).IsAssignableFrom(type))
                 .SelectMany(type => type.GetMethods(BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.Public))
                 .Where(m => !m.GetCustomAttributes(typeof(CompilerGeneratedAttribute), true).Any() &&
-                            m.GetCustomAttributes(typeof(HttpMethodAttribute), true).Any())
+                             m.GetCustomAttributes(typeof(HttpMethodAttribute), true).Any())
                 .Select(x => new HttpEndpoint
                 {
                     ControllerType = x.DeclaringType,
-                    Route = MakeRoute(x),
-                    ExampleRoute = MakeRouteFromXmlExamples(x),
+                    Route = BuildRoute(x),
+                    ExampleRoute = BuildRouteFromXmlExamples(x),
+                    XmlRouteErrors = ValidateXmlExamples(x),
                     Parameters = x.GetParameters(),
                     MethodInfo = x,
                     ReturnType = x.ReturnType,
@@ -53,9 +55,9 @@ namespace BufTools.AspNet.EndpointReflection
                        .ToDictionary(p => (HttpStatusCode)p.StatusCode, p => p.Type);
         }
 
-        private static string MakeRoute(MethodInfo info)
+        private static string BuildRoute(MethodInfo info)
         {
-            return MakeRoute(
+            return BuildRoute(
                 info.DeclaringType.GetCustomAttribute<RouteAttribute>(),
                 info.GetCustomAttribute<RouteAttribute>(),
                 info.GetCustomAttribute<HttpGetAttribute>(),
@@ -67,7 +69,7 @@ namespace BufTools.AspNet.EndpointReflection
                 info.GetCustomAttribute<HttpHeadAttribute>());
         }
 
-        private static string MakeRoute(params Attribute[] attributes)
+        private static string BuildRoute(params Attribute[] attributes)
         {
             var route = "";
             foreach (var attribute in attributes)
@@ -75,9 +77,27 @@ namespace BufTools.AspNet.EndpointReflection
             return route;
         }
 
-        private static string MakeRouteFromXmlExamples(MethodInfo methodInfo)
+        private static IList<IReportError> ValidateXmlExamples(MethodInfo methodInfo)
         {
-            var route = MakeRoute(methodInfo);
+            List<IReportError> errors;
+
+            ValidateAndBuildRouteFromXmlExamples(methodInfo, out errors);
+
+            return errors;
+        }
+
+        private static string BuildRouteFromXmlExamples(MethodInfo methodInfo)
+        {
+            var errors = new List<IReportError>();
+            
+            return ValidateAndBuildRouteFromXmlExamples(methodInfo, out errors);
+        }
+
+        private static string ValidateAndBuildRouteFromXmlExamples(MethodInfo methodInfo, out List<IReportError> errors)
+        {
+            errors = new List<IReportError>();
+
+            var route = BuildRoute(methodInfo);
             var paramInfo = methodInfo.GetParameters();
             var assembly = methodInfo.DeclaringType.Assembly;
             var controllerType = methodInfo.DeclaringType;
@@ -91,21 +111,31 @@ namespace BufTools.AspNet.EndpointReflection
                 var paramName = match.Groups[1].Value;
                 var param = paramInfo.Where(p => p.Name.Equals(paramName, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
                 if (param == null)
-                    throw new RouteParamMissingFromMethod($"{paramName} in route '{route}' does not have a parameter in {controllerType.Name}.{methodInfo.Name}");
+                {
+                    errors.Add(new RouteParamMissingFromMethod(paramName, route, methodInfo));
+                    continue;
+                }
 
                 var xmlDocs = assembly.LoadXmlDocumentation();
                 var endpointDocs = xmlDocs.GetDocumentation(methodInfo);
                 if (endpointDocs == null)
-                    throw new MissingXMLDocumentationForMethod($"XML Documentation not found for the '{controllerType.Name}.{methodInfo.Name}' method");
+                {
+                    errors.Add(new MissingXMLDocumentationForMethod(methodInfo));
+                    continue;
+                }
 
                 var paramDoc = endpointDocs.Params.Where(p => p.Name == paramName).FirstOrDefault();
                 if (paramDoc == null)
-                    throw new MissingXMLDocumentationForParam($"<param ...> XML tag not found for the '{paramName}' parameter in '{controllerType.Name}.{methodInfo.Name}'" +
-                                                              $"Try:\n <param name=\"{paramName}\" example=\"blah\">");
+                {
+                    errors.Add(new MissingXMLDocumentationForParam(paramName, methodInfo));
+                    continue;
+                }
 
                 if (string.IsNullOrWhiteSpace(paramDoc.Example))
-                    throw new MissingXMLExampleForParam($"The <param ...> XML tag does not have an example value for the '{paramName}' parameter of the '{controllerType.Name}.{methodInfo.Name}' method\n" +
-                                                        $"Try:\n <param name=\"{paramName}\" example=\"blah\">");
+                {
+                    errors.Add(new MissingXMLExampleForParam(paramName, methodInfo));
+                    continue;
+                }
 
                 route = route.Replace(match.Value, paramDoc.Example);
             }
