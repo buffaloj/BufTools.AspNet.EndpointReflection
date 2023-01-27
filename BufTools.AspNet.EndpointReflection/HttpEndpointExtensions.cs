@@ -53,8 +53,8 @@ namespace BufTools.AspNet.EndpointReflection
 
         private static HttpEndpoint AddXmlData(this HttpEndpoint endpoint, MethodInfo x)
         {
-            endpoint.ExampleRoute = BuildRouteFromXmlExamples(x);
-            endpoint.XmlValidationErrors = ValidateXmlExamples(x);
+            endpoint.ExampleRoute = ValidateAndBuildRouteFromXmlExamples(x, out var errors);
+            endpoint.XmlValidationErrors = errors;
 
             return endpoint;
         }
@@ -87,17 +87,6 @@ namespace BufTools.AspNet.EndpointReflection
             return route;
         }
 
-        private static IList<IReportError> ValidateXmlExamples(MethodInfo methodInfo)
-        {
-            ValidateAndBuildRouteFromXmlExamples(methodInfo, out var errors);
-            return errors;
-        }
-
-        private static string BuildRouteFromXmlExamples(MethodInfo methodInfo)
-        {
-            return ValidateAndBuildRouteFromXmlExamples(methodInfo, out var errors);
-        }
-
         private static string ValidateAndBuildRouteFromXmlExamples(MethodInfo methodInfo, out List<IReportError> errors)
         {
             errors = new List<IReportError>();
@@ -105,7 +94,6 @@ namespace BufTools.AspNet.EndpointReflection
             var route = BuildRoute(methodInfo);
             var paramInfo = methodInfo.GetParameters();
             var assembly = methodInfo.DeclaringType.Assembly;
-            var controllerType = methodInfo.DeclaringType;
 
             var loadedAssemblies = new HashSet<Assembly>();
 
