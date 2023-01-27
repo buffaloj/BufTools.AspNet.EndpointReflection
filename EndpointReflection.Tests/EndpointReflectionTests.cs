@@ -31,11 +31,11 @@ namespace Reflectamundo.Asp.Tests
             Assert.IsTrue(endpoints.All(e => e.ControllerType != null));
             Assert.IsTrue(endpoints.All(e => e.Assembly != null));
             Assert.IsTrue(endpoints.Any(e => e.ResponseTypes != null && e.ResponseTypes.Any()));
-            Assert.IsTrue(endpoints.Any(e => e.XmlRouteErrors != null));
-            Assert.IsTrue(endpoints.Any(e => e.XmlRouteErrors != null && e.XmlRouteErrors.Any(err => err is MissingXMLExampleForParam)));
-            Assert.IsTrue(endpoints.Any(e => e.XmlRouteErrors != null && e.XmlRouteErrors.Any(err => err is MissingXMLDocumentationForMethod)));
-            Assert.IsTrue(endpoints.Any(e => e.XmlRouteErrors != null && e.XmlRouteErrors.Any(err => err is MissingXMLExampleForParam)));
-            Assert.IsTrue(endpoints.Any(e => e.XmlRouteErrors != null && e.XmlRouteErrors.Any(err => err is RouteParamMissingFromMethod)));
+            Assert.IsTrue(endpoints.Any(e => e.XmlValidationErrors != null));
+            Assert.IsTrue(endpoints.Any(e => e.XmlValidationErrors != null && e.XmlValidationErrors.Any(err => err is MissingXMLExampleForParam)));
+            Assert.IsTrue(endpoints.Any(e => e.XmlValidationErrors != null && e.XmlValidationErrors.Any(err => err is MissingXMLDocumentationForMethod)));
+            Assert.IsTrue(endpoints.Any(e => e.XmlValidationErrors != null && e.XmlValidationErrors.Any(err => err is MissingXMLExampleForParam)));
+            Assert.IsTrue(endpoints.Any(e => e.XmlValidationErrors != null && e.XmlValidationErrors.Any(err => err is RouteParamMissingFromMethod)));
         }
     }
 }

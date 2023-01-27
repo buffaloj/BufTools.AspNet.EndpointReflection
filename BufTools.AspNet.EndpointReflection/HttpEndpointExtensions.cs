@@ -2,7 +2,6 @@
 using BufTools.AspNet.EndpointReflection.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
-using Microsoft.AspNetCore.Routing.Constraints;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,23 +29,34 @@ namespace BufTools.AspNet.EndpointReflection
                 .SelectMany(type => type.GetMethods(BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.Public))
                 .Where(m => !m.GetCustomAttributes(typeof(CompilerGeneratedAttribute), true).Any() &&
                              m.GetCustomAttributes(typeof(HttpMethodAttribute), true).Any())
-                .Select(x => new HttpEndpoint
-                {
-                    ControllerType = x.DeclaringType,
-                    Route = BuildRoute(x),
-                    ExampleRoute = BuildRouteFromXmlExamples(x),
-                    XmlRouteErrors = ValidateXmlExamples(x),
-                    Parameters = x.GetParameters(),
-                    MethodInfo = x,
-                    ReturnType = x.ReturnType,
-                    Assembly = x.DeclaringType.Assembly,
-                    Verb = GetVerb(x),
-                    BodyPayloadType = GetPayloadType(x.GetParameters()),
-                    EndpointMethodName = x.Name,
-                    ResponseTypes = GetResponseTypes(x)
-                })
+                .Select(x => BuildEndpoint(x).AddXmlData(x))
                 .OrderBy(x => x.ControllerType.Name)
                 .ThenBy(x => x.MethodInfo.Name);
+        }
+
+        private static HttpEndpoint BuildEndpoint(MethodInfo x)
+        {
+            return new HttpEndpoint
+            {
+                ControllerType = x.DeclaringType,
+                Route = BuildRoute(x),
+                Parameters = x.GetParameters(),
+                MethodInfo = x,
+                ReturnType = x.ReturnType,
+                Assembly = x.DeclaringType.Assembly,
+                Verb = GetVerb(x),
+                BodyPayloadType = GetPayloadType(x.GetParameters()),
+                EndpointMethodName = x.Name,
+                ResponseTypes = GetResponseTypes(x)
+            };
+        }
+
+        private static HttpEndpoint AddXmlData(this HttpEndpoint endpoint, MethodInfo x)
+        {
+            endpoint.ExampleRoute = BuildRouteFromXmlExamples(x);
+            endpoint.XmlValidationErrors = ValidateXmlExamples(x);
+
+            return endpoint;
         }
 
         private static IDictionary<HttpStatusCode, Type> GetResponseTypes(MethodInfo info)

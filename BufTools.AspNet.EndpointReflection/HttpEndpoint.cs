@@ -24,7 +24,7 @@ namespace BufTools.AspNet.EndpointReflection
         /// <summary>
         /// To construct an <see cref="ExampleRoute"/> from XML comments, there must be XML comments.  This collection lists and missing comments 
         /// </summary>
-        public IList<IReportError> XmlRouteErrors { get; set; }
+        public IList<IReportError> XmlValidationErrors { get; set; }
 
         /// <summary>
         /// The HTTP verb the endpoint responds to
