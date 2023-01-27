@@ -89,18 +89,13 @@ namespace BufTools.AspNet.EndpointReflection
 
         private static IList<IReportError> ValidateXmlExamples(MethodInfo methodInfo)
         {
-            List<IReportError> errors;
-
-            ValidateAndBuildRouteFromXmlExamples(methodInfo, out errors);
-
+            ValidateAndBuildRouteFromXmlExamples(methodInfo, out var errors);
             return errors;
         }
 
         private static string BuildRouteFromXmlExamples(MethodInfo methodInfo)
         {
-            var errors = new List<IReportError>();
-            
-            return ValidateAndBuildRouteFromXmlExamples(methodInfo, out errors);
+            return ValidateAndBuildRouteFromXmlExamples(methodInfo, out var errors);
         }
 
         private static string ValidateAndBuildRouteFromXmlExamples(MethodInfo methodInfo, out List<IReportError> errors)
