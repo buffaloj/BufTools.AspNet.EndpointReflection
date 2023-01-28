@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BufTools.AspNet.EndpointReflection\BufTools.AspNet.EndpointReflection.csproj" />
+    <ProjectReference Include="..\TestWebApiNoXml\TestWebApiNoXml.csproj" />
     <ProjectReference Include="..\TestWebApi\TestWebApi.csproj" />
   </ItemGroup>
 

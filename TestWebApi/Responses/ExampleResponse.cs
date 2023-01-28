@@ -1,4 +1,4 @@
-namespace Reflectamundo.TestWebApi.Responses
+namespace TestWebApi.Responses
 {
     /// <summary>
     /// An example of a resopnse from an HTTP request

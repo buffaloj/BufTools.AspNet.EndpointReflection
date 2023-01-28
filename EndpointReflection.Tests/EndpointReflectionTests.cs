@@ -1,6 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Reflectamundo.TestWebApi.Controllers;
-using System.Reflection;
 using BufTools.AspNet.EndpointReflection;
 using BufTools.AspNet.EndpointReflection.Exceptions;
 
@@ -9,21 +7,16 @@ namespace Reflectamundo.Asp.Tests
     [TestClass]
     public class EndpointReflectionTests
     {
-        private readonly Assembly _assembly;
-
-        public EndpointReflectionTests()
-        {
-            _assembly = typeof(ExampleController).Assembly;
-        }
-
         [TestMethod]
         public void GetEndpoints_WithValidAssembly_GetsEndpoints()
         {
-            var endpoints = _assembly.GetEndpoints().ToList();
+            var assembly = typeof(TestWebApi.Controllers.ExampleController).Assembly;
+            
+            var endpoints = assembly.GetEndpoints().ToList();
 
             Assert.IsNotNull(endpoints);
             Assert.IsTrue(endpoints.All(e => !string.IsNullOrEmpty(e.Route)));
-            Assert.IsTrue(endpoints.All(e => !string.IsNullOrEmpty(e.ExampleRoute)));
+            Assert.IsTrue(endpoints.Any(e => !string.IsNullOrEmpty(e.ExampleRoute)));
             Assert.IsTrue(endpoints.All(e => !string.IsNullOrEmpty(e.MethodName)));
             Assert.IsTrue(endpoints.All(e => e.ReturnType != null));
             Assert.IsTrue(endpoints.All(e => e.ControllerType != null));
@@ -44,6 +37,20 @@ namespace Reflectamundo.Asp.Tests
             Assert.IsTrue(endpoints.Count(e => e.AllXmlValidationErrors.Any(err => err is MissingXMLExceptionDescription)) == 1);
             Assert.IsTrue(endpoints.Count(e => e.AllXmlValidationErrors.Any(err => err is MissingXMLExceptionType)) == 1);
             Assert.IsTrue(endpoints.Count(e => e.AllXmlValidationErrors.Any(err => err is MissingXMLReturnsDescription)) == 1);
+        }
+
+        [TestMethod]
+        public void GetEndpoints_WhenXmlCommentsNotIncludedInBuild_CompletesWithValidationErrors()
+        {
+            var assembly = typeof(TestWebApiNoXml.Controllers.ExampleController).Assembly;
+
+            var endpoints = assembly.GetEndpoints().ToList();
+
+            Assert.IsNotNull(endpoints);
+            Assert.IsTrue(endpoints.Count(e => e.XmlRouteValidationErrors.Any(err => err is MissingXMLFileForAssembly)) == 2);
+            Assert.IsTrue(endpoints.Count(e => e.AllXmlValidationErrors.Any(err => err is MissingXMLFileForAssembly)) == 2);
+
+            Assert.IsTrue(endpoints.Count(e => string.IsNullOrEmpty(e.ExampleRoute) ) == 2);
         }
     }
 }

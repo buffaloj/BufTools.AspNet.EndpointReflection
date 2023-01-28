@@ -1,4 +1,4 @@
-﻿namespace Reflectamundo.TestWebApi.Requests
+﻿namespace TestWebApi.Requests
 {
     /// <summary>
     /// An example of a Rquest for an HTTP request

@@ -19,7 +19,7 @@ namespace BufTools.AspNet.EndpointReflection
     public static class HttpEndpointExtensions
     {
         /// <summary>
-        /// Using reflection, this method finds the endpoints in the assembly
+        /// Combines reflection and XML comment parsing to finds the endpoints in the assembly and the details about them
         /// </summary>
         /// <param name="assembly">The assembly to search within to find endpoints</param>
         /// <returns>A collection of <see cref="HttpEndpoint"/> instances.  One for each endpoint.</returns>
@@ -75,6 +75,12 @@ namespace BufTools.AspNet.EndpointReflection
             // Load XML documentation
             var assembly = methodInfo.DeclaringType.Assembly;
             var xmlDocs = assembly.LoadXmlDocumentation();
+            if (xmlDocs == null)
+            {
+                allErrors.Add(new MissingXMLFileForAssembly(endpoint.Assembly));
+                return endpoint;
+            }
+
             var endpointDocs = xmlDocs.GetDocumentation(methodInfo);
             if (endpointDocs == null)
             {
@@ -164,20 +170,30 @@ namespace BufTools.AspNet.EndpointReflection
 
             var regex = new Regex("{(.*?)}");
             var routeParams = regex.Matches(route);
+            var routeGood = true;
             foreach (Match routeParam in routeParams)
             {
                 var paramName = routeParam.Groups[1].Value;
                 var param = paramInfo.Where(p => p.Name.Equals(paramName, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
                 if (param == null)
                 {
+                    routeGood = false;
                     errors.Add(new RouteParamMissingFromMethod(paramName, route, methodInfo));
                     continue;
                 }
 
                 var xmlDocs = assembly.LoadXmlDocumentation();
+                if (xmlDocs == null)
+                {
+                    routeGood = false;
+                    errors.Add(new MissingXMLFileForAssembly(assembly));
+                    continue;
+                }
+
                 var endpointDocs = xmlDocs.GetDocumentation(methodInfo);
                 if (endpointDocs == null)
                 {
+                    routeGood = false;
                     errors.Add(new MissingXMLDocumentationForMethod(methodInfo));
                     continue;
                 }
@@ -185,12 +201,14 @@ namespace BufTools.AspNet.EndpointReflection
                 var paramDoc = endpointDocs.Params.Where(p => p.Name == paramName).FirstOrDefault();
                 if (paramDoc == null)
                 {
+                    routeGood = false;
                     errors.Add(new MissingXMLDocumentationForParam(paramName, methodInfo));
                     continue;
                 }
 
                 if (string.IsNullOrWhiteSpace(paramDoc.Example))
                 {
+                    routeGood = false;
                     errors.Add(new MissingXMLExampleForParam(paramName, methodInfo));
                     continue;
                 }
@@ -198,7 +216,7 @@ namespace BufTools.AspNet.EndpointReflection
                 route = route.Replace(routeParam.Value, paramDoc.Example);
             }
 
-            return route;
+            return routeGood ? route : "";
         }
 
         private static IDictionary<HttpStatusCode, Type> GetResponseTypes(MethodInfo info)

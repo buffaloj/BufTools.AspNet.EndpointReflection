@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
-using Reflectamundo.TestWebApi.Filters;
-using Reflectamundo.TestWebApi.Requests;
-using Reflectamundo.TestWebApi.Responses;
+using TestWebApi.Filters;
+using TestWebApi.Requests;
+using TestWebApi.Responses;
 
-namespace Reflectamundo.TestWebApi.Controllers
+namespace TestWebApi.Controllers
 {
     /// <summary>
     /// An example controller with example endpoints

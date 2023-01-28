@@ -7,13 +7,24 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>Endpoint Reflection</Title>
     <Authors>Jeremy Shull</Authors>
-    <Description>Uses reflection to easily find all endpoints in an assembly.</Description>
+    <Description>Combines reflection and XML comment parsing to put endpoint details at your fingertips.
+
+Provides:
+- Route &amp; Verb
+- Useable example route with route params filled in XML examples
+- Endpoint method details
+- XML comments
+- Validation of XML comments with suggestions on how to fix errors
+</Description>
     <Copyright>Copyright (c) Jeremy Shull, 2023</Copyright>
     <PackageProjectUrl>https://github.com/buffaloj/BufTools.AspNet.EndpointReflection</PackageProjectUrl>
     <RepositoryUrl>https://github.com/buffaloj/BufTools.AspNet.EndpointReflection</RepositoryUrl>
     <PackageIcon>icon.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <Version>1.1.0</Version>
+    <PackageReleaseNotes>Expanded the data collected on each endpoint and added validation services.</PackageReleaseNotes>
+    <PackageTags>swagger;endpoint;reflection;mstest;test;automation;endpointreflection;unittest;unit;asp;aspcore</PackageTags>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

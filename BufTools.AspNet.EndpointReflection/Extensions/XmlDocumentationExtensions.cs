@@ -18,7 +18,8 @@ namespace BufTools.AspNet.EndpointReflection.Extensions
             string xmlFilePath = Path.Combine(xmlDirectoryPath, assembly.GetName().Name + ".xml");
 
             if (!File.Exists(xmlFilePath))
-                throw new FileNotFoundException(string.Format(ProjectResources.XmlFileNotFoundFormat, xmlFilePath));
+                return null;
+                //throw new FileNotFoundException(string.Format(ProjectResources.XmlFileNotFoundFormat, xmlFilePath));
 
             return LoadXmlDocumentation(File.ReadAllText(xmlFilePath));
         }

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace Reflectamundo.TestWebApi.Filters
+namespace TestWebApi.Filters
 {
     /// <summary>
     /// An example of using an object to store filter parameters for an HTTP request
