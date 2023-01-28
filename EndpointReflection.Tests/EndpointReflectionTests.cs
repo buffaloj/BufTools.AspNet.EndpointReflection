@@ -43,6 +43,7 @@ namespace Reflectamundo.Asp.Tests
             Assert.IsTrue(endpoints.Any(e => e.AllXmlValidationErrors.Any(err => err is RouteParamMissingFromMethod)));
             Assert.IsTrue(endpoints.Count(e => e.AllXmlValidationErrors.Any(err => err is MissingXMLExceptionDescription)) == 1);
             Assert.IsTrue(endpoints.Count(e => e.AllXmlValidationErrors.Any(err => err is MissingXMLExceptionType)) == 1);
+            Assert.IsTrue(endpoints.Count(e => e.AllXmlValidationErrors.Any(err => err is MissingXMLReturnsDescription)) == 1);
         }
     }
 }

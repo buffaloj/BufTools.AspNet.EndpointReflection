@@ -203,6 +203,7 @@ namespace Reflectamundo.TestWebApi.Controllers
         /// An endpoint with no returns XML
         /// </summary>
         /// <param name="id">A request object</param>
+        /// <returns>A message!</returns>
         [HttpOptions("example/no_returns_xml/{id}")]
         public IActionResult EndpointWithNoReturnsXml(int id)
         {
@@ -214,6 +215,7 @@ namespace Reflectamundo.TestWebApi.Controllers
         /// An endpoint with no param description
         /// </summary>
         /// <param name="id"></param>
+        /// <returns>A message!</returns>
         [HttpOptions("example/no_param_description/{id}")]
         public IActionResult EndpointWithNoParamDescription(int id)
         {
@@ -224,6 +226,7 @@ namespace Reflectamundo.TestWebApi.Controllers
         /// <summary>
         /// </summary>
         /// <param name="id"></param>
+        /// <returns>A message!</returns>
         [HttpOptions("example/no_summary/{id}")]
         public IActionResult EndpointWithNoSummary(int id)
         {
@@ -235,6 +238,7 @@ namespace Reflectamundo.TestWebApi.Controllers
         /// An endpoint with no description on the exception
         /// </summary>
         /// <exception cref="ExampleRequest"></exception>
+        /// <returns>A message!</returns>
         [HttpOptions("example/no_exception_description")]
         public IActionResult EndpointWithNoExceptionDescription()
         {
@@ -243,11 +247,33 @@ namespace Reflectamundo.TestWebApi.Controllers
         }
 
         /// <summary>
-        /// An endpoint with no exception type
+        /// An endpoint with no description on the exception
         /// </summary>
-        /// <exception cref="">It has a description</exception>
+        /// <exception cref="">Description</exception>
+        /// <returns>A message!</returns>
         [HttpOptions("example/no_exception_description")]
         public IActionResult EndpointWithNoExceptionType()
+        {
+            var response = new ExampleResponse { ReturnedId = 5 };
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// An endpoint with no description on the exception
+        /// </summary>
+        [HttpOptions("example/no_returns_field")]
+        public IActionResult EndpointWithNoReturnsField()
+        {
+            var response = new ExampleResponse { ReturnedId = 5 };
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// An endpoint with no description on the exception
+        /// </summary>
+        /// <returns></returns>
+        [HttpOptions("example/has_returns_but_no_description")]
+        public IActionResult EndpointWithNoReturnsDescription()
         {
             var response = new ExampleResponse { ReturnedId = 5 };
             return Ok(response);

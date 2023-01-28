@@ -93,6 +93,8 @@ namespace BufTools.AspNet.EndpointReflection
 
             // Add the returns
             endpoint.XmlReturns = endpointDocs.Returns;
+            if (endpointDocs.Returns != null && string.IsNullOrWhiteSpace(endpointDocs.Returns))
+                allErrors.Add(new MissingXMLReturnsDescription(methodInfo));
 
             // Add the remarks
             endpoint.XmlRemarks = endpointDocs.Remarks;
