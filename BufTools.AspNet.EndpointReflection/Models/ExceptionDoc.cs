@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace BufTools.AspNet.EndpointReflection.Models
+﻿namespace BufTools.AspNet.EndpointReflection.Models
 {
     public class ExceptionDoc
     {

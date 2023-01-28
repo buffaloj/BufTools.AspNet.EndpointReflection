@@ -1,5 +1,4 @@
-﻿using BufTools.AspNet.EndpointReflection.Exceptions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Reflection;
@@ -92,12 +91,5 @@ namespace BufTools.AspNet.EndpointReflection
         /// A collection of exceptions thrown by the endpoint listed in the XML comments
         /// </summary>
         public IEnumerable<EndpointException> XmlExceptions { get; set; }
-
-        // Is IReportError good name?
-        //   share errors with object mother?
-
-        // Change error to not be exceptions?
-
-        // break test out into many
     }
 }
