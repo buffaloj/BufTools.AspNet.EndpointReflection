@@ -24,7 +24,7 @@ namespace Reflectamundo.Asp.Tests
             Assert.IsNotNull(endpoints);
             Assert.IsTrue(endpoints.All(e => !string.IsNullOrEmpty(e.Route)));
             Assert.IsTrue(endpoints.All(e => !string.IsNullOrEmpty(e.ExampleRoute)));
-            Assert.IsTrue(endpoints.All(e => !string.IsNullOrEmpty(e.EndpointMethodName)));
+            Assert.IsTrue(endpoints.All(e => !string.IsNullOrEmpty(e.MethodName)));
             Assert.IsTrue(endpoints.All(e => e.ReturnType != null));
             Assert.IsTrue(endpoints.All(e => e.ControllerType != null));
             Assert.IsTrue(endpoints.All(e => e.Assembly != null));

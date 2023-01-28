@@ -51,12 +51,12 @@ namespace BufTools.AspNet.EndpointReflection
         /// <summary>
         /// The name of the method that handles the endpoint
         /// </summary>
-        public string EndpointMethodName { get; set; }
+        public string MethodName { get; set; }
 
         /// <summary>
         /// A collection of the params the endpoint method accepts
         /// </summary>
-        public IEnumerable<EndpointParam> EndpointParams { get; set; }
+        public IEnumerable<EndpointParam> MethodParams { get; set; }
 
         /// <summary>
         /// The return type of the endpoint method
@@ -96,17 +96,15 @@ namespace BufTools.AspNet.EndpointReflection
         // Is IReportError good name?
         //   share errors with object mother?
 
-        // are tags swapped out with type in the comments or do I need to do that?
-
         // break test out into many
 
         // Change error to not be exceptions?
 
-        // ensure errors have correct text
-
         // how are params without attributes figured out by asp?
 
         // does "Options(ExampleRequest request" find the body type without the [FromBody]tag?
-        //  need specific check for this
+        // need specific check for this
+
+        // split error out from suggestion
     }
 }

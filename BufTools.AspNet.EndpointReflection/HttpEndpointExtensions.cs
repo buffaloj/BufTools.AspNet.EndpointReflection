@@ -32,7 +32,7 @@ namespace BufTools.AspNet.EndpointReflection
                              m.GetCustomAttributes(typeof(HttpMethodAttribute), true).Any())
                 .Select(x => BuildEndpoint(x).AddXmlExampleRoute(x).AddXmlData(x))
                 .OrderBy(x => x.ControllerType.Name)
-                .ThenBy(x => x.EndpointMethodName);
+                .ThenBy(x => x.MethodName);
         }
 
         private static HttpEndpoint BuildEndpoint(MethodInfo x)
@@ -45,7 +45,7 @@ namespace BufTools.AspNet.EndpointReflection
                 Assembly = x.DeclaringType.Assembly,
                 Verb = GetVerb(x),
                 BodyPayloadType = GetPayloadType(x.GetParameters()),
-                EndpointMethodName = x.Name,
+                MethodName = x.Name,
                 ResponseTypes = GetResponseTypes(x)
             };
         }
@@ -63,7 +63,7 @@ namespace BufTools.AspNet.EndpointReflection
             endpoint.AllXmlValidationErrors = allErrors;
 
             var endpointParams = new List<EndpointParam>();
-            endpoint.EndpointParams = endpointParams;
+            endpoint.MethodParams = endpointParams;
 
             // Find missing route params
             var regex = new Regex("{(.*?)}");
