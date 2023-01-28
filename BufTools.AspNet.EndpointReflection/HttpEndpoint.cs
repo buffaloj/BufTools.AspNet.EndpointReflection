@@ -104,8 +104,6 @@ namespace BufTools.AspNet.EndpointReflection
 
         // ensure errors have correct text
 
-        // more errors when something is not found
-
         // how are params without attributes figured out by asp?
 
         // does "Options(ExampleRequest request" find the body type without the [FromBody]tag?

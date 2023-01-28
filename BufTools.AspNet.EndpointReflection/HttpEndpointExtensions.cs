@@ -154,7 +154,6 @@ namespace BufTools.AspNet.EndpointReflection
             return ParamUsageTypes.Body;
         }
 
-
         private static string ValidateAndBuildRouteFromXmlExamples(MethodInfo methodInfo, out List<IReportError> errors)
         {
             errors = new List<IReportError>();
