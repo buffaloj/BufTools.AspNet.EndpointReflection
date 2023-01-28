@@ -22,9 +22,16 @@ namespace BufTools.AspNet.EndpointReflection
         public string ExampleRoute { get; set; }
 
         /// <summary>
-        /// To construct an <see cref="ExampleRoute"/> from XML comments, there must be XML comments.  This collection lists and missing comments 
+        /// To construct an <see cref="ExampleRoute"/> from XML comments, there must be XML comments.  This collection lists the required XML comment data 
         /// </summary>
-        public IList<IReportError> XmlValidationErrors { get; set; }
+        /// <remarks>This error collection only deals with errors that must be dealt with to use the example route</remarks>
+        public IList<IReportError> XmlRouteValidationErrors { get; set; }
+
+        /// <summary>
+        /// If XML comments are missing on an endpoint, this will list them.
+        /// </summary>
+        /// <remarks>This warning collection lists all missing XML data on the endpoint</remarks>
+        public IList<IReportError> AllXmlValidationErrors { get; set; }
 
         /// <summary>
         /// The HTTP verb the endpoint responds to
@@ -47,6 +54,11 @@ namespace BufTools.AspNet.EndpointReflection
         public string EndpointMethodName { get; set; }
 
         /// <summary>
+        /// A collection of the params the endpoint method accepts
+        /// </summary>
+        public IEnumerable<EndpointParam> EndpointParams { get; set; }
+
+        /// <summary>
         /// The return type of the endpoint method
         /// </summary>
         public Type ReturnType { get; set; }
@@ -62,19 +74,40 @@ namespace BufTools.AspNet.EndpointReflection
         public Assembly Assembly { get; set; }
 
         /// <summary>
-        /// Reflection info for the parameters that the endpoint method accepts
+        /// The text from the XML 'summary'  field
         /// </summary>
-        public ParameterInfo[] Parameters { get; set; }
+        public string XmlSummary { get; set; }
 
         /// <summary>
-        /// Reflection info for the method that implements the endpoint 
+        /// The text from the XML 'returns'  field
         /// </summary>
-        public MethodInfo MethodInfo { get; set; }
+        public string XmlReturns { get; set; }
 
-        // XML Description
-        // XML return desc
-        // param descriptions
-        // param examples
+        /// <summary>
+        /// A collection of 'remarks' from the XML comments
+        /// </summary>
+        public IEnumerable<string> XmlRemarks { get; set; }
+
+        /// <summary>
+        /// A collection of exceptions thrown by the endpoint listed in the XML comments
+        /// </summary>
+        public IEnumerable<EndpointException> XmlExceptions { get; set; }
+
+        // Is IReportError good name?
+        //   share errors with object mother?
+
+        // are tags swapped out with type in the comments or do I need to do that?
+
+        // break test out into many
+
+        // Change error to not be exceptions?
+
+        // ensure errors have correct text
+
+        // more errors when something is not found
+
+        // how are params without attributes figured out by asp?
+
         // does "Options(ExampleRequest request" find the body type without the [FromBody]tag?
         //  need specific check for this
     }

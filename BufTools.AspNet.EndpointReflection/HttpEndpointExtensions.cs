@@ -1,13 +1,18 @@
 ﻿using BufTools.AspNet.EndpointReflection.Exceptions;
 using BufTools.AspNet.EndpointReflection.Extensions;
+using BufTools.AspNet.EndpointReflection.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.Routing;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 
 namespace BufTools.AspNet.EndpointReflection
@@ -29,9 +34,9 @@ namespace BufTools.AspNet.EndpointReflection
                 .SelectMany(type => type.GetMethods(BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.Public))
                 .Where(m => !m.GetCustomAttributes(typeof(CompilerGeneratedAttribute), true).Any() &&
                              m.GetCustomAttributes(typeof(HttpMethodAttribute), true).Any())
-                .Select(x => BuildEndpoint(x).AddXmlData(x))
+                .Select(x => BuildEndpoint(x).AddXmlExampleRoute(x).AddXmlData(x))
                 .OrderBy(x => x.ControllerType.Name)
-                .ThenBy(x => x.MethodInfo.Name);
+                .ThenBy(x => x.EndpointMethodName);
         }
 
         private static HttpEndpoint BuildEndpoint(MethodInfo x)
@@ -40,8 +45,6 @@ namespace BufTools.AspNet.EndpointReflection
             {
                 ControllerType = x.DeclaringType,
                 Route = BuildRoute(x),
-                Parameters = x.GetParameters(),
-                MethodInfo = x,
                 ReturnType = x.ReturnType,
                 Assembly = x.DeclaringType.Assembly,
                 Verb = GetVerb(x),
@@ -51,41 +54,110 @@ namespace BufTools.AspNet.EndpointReflection
             };
         }
 
-        private static HttpEndpoint AddXmlData(this HttpEndpoint endpoint, MethodInfo x)
+        private static HttpEndpoint AddXmlExampleRoute(this HttpEndpoint endpoint, MethodInfo x)
         {
             endpoint.ExampleRoute = ValidateAndBuildRouteFromXmlExamples(x, out var errors);
-            endpoint.XmlValidationErrors = errors;
+            endpoint.XmlRouteValidationErrors = errors;
+            return endpoint;
+        }
+
+        private static HttpEndpoint AddXmlData(this HttpEndpoint endpoint, MethodInfo methodInfo)
+        {
+            var allErrors = new List<IReportError>();
+            endpoint.AllXmlValidationErrors = allErrors;
+
+            var endpointParams = new List<EndpointParam>();
+            endpoint.EndpointParams = endpointParams;
+
+            // Find missing route params
+            var regex = new Regex("{(.*?)}");
+            var routeParams = regex.Matches(endpoint.Route).Select(p => p.Groups[1].Value);
+            var missing = routeParams.Where(rp => !methodInfo.GetParameters().Any(p => p.Name == rp))
+                                     .Select(rp => new RouteParamMissingFromMethod(rp, endpoint.Route, methodInfo));
+            allErrors.AddRange(missing);
+
+            // Load XML documentation
+            var assembly = methodInfo.DeclaringType.Assembly;
+            var xmlDocs = assembly.LoadXmlDocumentation();
+            var endpointDocs = xmlDocs.GetDocumentation(methodInfo);
+            if (endpointDocs == null)
+            {
+                allErrors.Add(new MissingXMLDocumentationForMethod(methodInfo));
+                return endpoint;
+            }
+
+            // Add the Summary
+            endpoint.XmlSummary = endpointDocs.Summary;
+            if (string.IsNullOrWhiteSpace(endpointDocs.Summary))
+                allErrors.Add(new MissingXMLSummary(methodInfo));
+
+            // Add the returns
+            endpoint.XmlReturns = endpointDocs.Returns;
+            if (string.IsNullOrWhiteSpace(endpointDocs.Returns))
+                allErrors.Add(new MissingXMLReturns(methodInfo));
+
+            // Add the remarks
+            endpoint.XmlRemarks = endpointDocs.Remarks;
+            
+            // Add the exception info
+            endpoint.XmlExceptions = endpointDocs.Exceptions.Select(e => new EndpointException
+            {
+                XMLDescription = e.Description,
+                ExceptionType = e.ExceptionType
+            });
+            allErrors.AddRange(endpoint.XmlExceptions
+                .Where(e => !string.IsNullOrWhiteSpace(e.XMLDescription) &&
+                            string.IsNullOrWhiteSpace(e.ExceptionType))
+                .Select(e => new MissingXMLExceptionDescription(e.ExceptionType, methodInfo)));
+
+            allErrors.AddRange(endpoint.XmlExceptions
+                .Where(e => string.IsNullOrWhiteSpace(e.ExceptionType))
+                .Select(e => new MissingXMLExceptionType(methodInfo)));
+
+            foreach (var param in methodInfo.GetParameters())   
+            {
+                var paramDoc = endpointDocs.Params.Where(p => p.Name == param.Name).FirstOrDefault();
+                if (paramDoc == null)
+                    allErrors.Add(new MissingXMLDocumentationForParam(param.Name, methodInfo));
+
+                if (paramDoc != null && string.IsNullOrWhiteSpace(paramDoc.Example))
+                    allErrors.Add(new MissingXMLExampleForParam(param.Name, methodInfo));
+
+                if (paramDoc != null && string.IsNullOrWhiteSpace(paramDoc.Description))
+                    allErrors.Add(new MissingXMLParamDescription(param.Name, methodInfo));
+
+                endpointParams.Add(new EndpointParam
+                {
+                    ParamType = param.ParameterType,
+                    XmlExample = paramDoc?.Example,
+                    XMLDescription = paramDoc?.Description,
+                    UseageType = param.ToUseageType(endpoint.Route)
+                });
+            }
 
             return endpoint;
         }
 
-        private static IDictionary<HttpStatusCode, Type> GetResponseTypes(MethodInfo info)
+        private static ParamUsageTypes ToUseageType(this ParameterInfo p, string route)
         {
-            return info.GetCustomAttributes<ProducesResponseTypeAttribute>()
-                       .ToDictionary(p => (HttpStatusCode)p.StatusCode, p => p.Type);
+            if (p.GetCustomAttribute<FromBodyAttribute>() != null)
+                return ParamUsageTypes.Body;
+
+            if (p.GetCustomAttribute<FromQueryAttribute>() != null)
+                return ParamUsageTypes.Query;
+
+            if (p.GetCustomAttribute<FromRouteAttribute>() != null)
+                return ParamUsageTypes.Route;
+
+            if (p.HasDefaultValue)// && p.DefaultValue == null )
+                return ParamUsageTypes.Query;
+
+            if (route.Contains("{" + p.Name + "}"))
+                return ParamUsageTypes.Route;
+
+            return ParamUsageTypes.Body;
         }
 
-        private static string BuildRoute(MethodInfo info)
-        {
-            return BuildRoute(
-                info.DeclaringType.GetCustomAttribute<RouteAttribute>(),
-                info.GetCustomAttribute<RouteAttribute>(),
-                info.GetCustomAttribute<HttpGetAttribute>(),
-                info.GetCustomAttribute<HttpPutAttribute>(),
-                info.GetCustomAttribute<HttpPostAttribute>(),
-                info.GetCustomAttribute<HttpDeleteAttribute>(),
-                info.GetCustomAttribute<HttpPatchAttribute>(),
-                info.GetCustomAttribute<HttpOptionsAttribute>(),
-                info.GetCustomAttribute<HttpHeadAttribute>());
-        }
-
-        private static string BuildRoute(params Attribute[] attributes)
-        {
-            var route = "";
-            foreach (var attribute in attributes)
-                route += attribute.Route();
-            return route;
-        }
 
         private static string ValidateAndBuildRouteFromXmlExamples(MethodInfo methodInfo, out List<IReportError> errors)
         {
@@ -95,13 +167,11 @@ namespace BufTools.AspNet.EndpointReflection
             var paramInfo = methodInfo.GetParameters();
             var assembly = methodInfo.DeclaringType.Assembly;
 
-            var loadedAssemblies = new HashSet<Assembly>();
-
             var regex = new Regex("{(.*?)}");
-            var matches = regex.Matches(route);
-            foreach (Match match in matches)
+            var routeParams = regex.Matches(route);
+            foreach (Match routeParam in routeParams)
             {
-                var paramName = match.Groups[1].Value;
+                var paramName = routeParam.Groups[1].Value;
                 var param = paramInfo.Where(p => p.Name.Equals(paramName, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
                 if (param == null)
                 {
@@ -130,9 +200,37 @@ namespace BufTools.AspNet.EndpointReflection
                     continue;
                 }
 
-                route = route.Replace(match.Value, paramDoc.Example);
+                route = route.Replace(routeParam.Value, paramDoc.Example);
             }
 
+            return route;
+        }
+
+        private static IDictionary<HttpStatusCode, Type> GetResponseTypes(MethodInfo info)
+        {
+            return info.GetCustomAttributes<ProducesResponseTypeAttribute>()
+                       .ToDictionary(p => (HttpStatusCode)p.StatusCode, p => p.Type);
+        }
+
+        private static string BuildRoute(MethodInfo info)
+        {
+            return BuildRoute(
+                info.DeclaringType.GetCustomAttribute<RouteAttribute>(),
+                info.GetCustomAttribute<RouteAttribute>(),
+                info.GetCustomAttribute<HttpGetAttribute>(),
+                info.GetCustomAttribute<HttpPutAttribute>(),
+                info.GetCustomAttribute<HttpPostAttribute>(),
+                info.GetCustomAttribute<HttpDeleteAttribute>(),
+                info.GetCustomAttribute<HttpPatchAttribute>(),
+                info.GetCustomAttribute<HttpOptionsAttribute>(),
+                info.GetCustomAttribute<HttpHeadAttribute>());
+        }
+
+        private static string BuildRoute(params Attribute[] attributes)
+        {
+            var route = "";
+            foreach (var attribute in attributes)
+                route += attribute.Route();
             return route;
         }
 

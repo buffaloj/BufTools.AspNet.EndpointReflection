@@ -51,12 +51,34 @@ namespace BufTools.AspNet.EndpointReflection.Extensions
                         if (xmlReader.NodeType == XmlNodeType.Element && xmlReader.Name == "example")
                             currentDoc.Example = xmlReader.ReadInnerXml();
 
+                        if (xmlReader.NodeType == XmlNodeType.Element && xmlReader.Name == "returns")
+                            currentDoc.Returns = xmlReader.ReadInnerXml();
+
                         if (xmlReader.NodeType == XmlNodeType.Element && xmlReader.Name == "param")
                         {
                             var parameter = new ParamDoc();
                             currentDoc.Params.Add(parameter);
                             parameter.Name = xmlReader["name"];
                             parameter.Example = xmlReader["example"];
+                            parameter.Description = xmlReader.ReadInnerXml();
+                        }
+
+                        if (xmlReader.NodeType == XmlNodeType.Element && xmlReader.Name == "exception")
+                        {
+                            var doc = new ExceptionDoc();
+                            currentDoc.Exceptions.Add(doc);
+                            var type = xmlReader["cref"];
+                            var pos = type.IndexOf(':');
+
+                            doc.ExceptionType = (pos > -1) ? type.Remove(0, pos+1) : type;
+                            doc.Description = xmlReader.ReadInnerXml();
+                        }
+
+                        if (xmlReader.NodeType == XmlNodeType.Element && xmlReader.Name == "remarks")
+                        {
+                            var remark = xmlReader.ReadInnerXml();
+                            if (string.IsNullOrWhiteSpace(remark))
+                                currentDoc.Remarks.Add(remark);
                         }
                     }
                 }

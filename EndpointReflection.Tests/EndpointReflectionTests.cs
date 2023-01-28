@@ -25,17 +25,25 @@ namespace Reflectamundo.Asp.Tests
             Assert.IsTrue(endpoints.All(e => !string.IsNullOrEmpty(e.Route)));
             Assert.IsTrue(endpoints.All(e => !string.IsNullOrEmpty(e.ExampleRoute)));
             Assert.IsTrue(endpoints.All(e => !string.IsNullOrEmpty(e.EndpointMethodName)));
-            Assert.IsTrue(endpoints.All(e => e.Parameters != null));
-            Assert.IsTrue(endpoints.All(e => e.MethodInfo != null));
             Assert.IsTrue(endpoints.All(e => e.ReturnType != null));
             Assert.IsTrue(endpoints.All(e => e.ControllerType != null));
             Assert.IsTrue(endpoints.All(e => e.Assembly != null));
             Assert.IsTrue(endpoints.Any(e => e.ResponseTypes != null && e.ResponseTypes.Any()));
-            Assert.IsTrue(endpoints.Any(e => e.XmlValidationErrors != null));
-            Assert.IsTrue(endpoints.Any(e => e.XmlValidationErrors != null && e.XmlValidationErrors.Any(err => err is MissingXMLExampleForParam)));
-            Assert.IsTrue(endpoints.Any(e => e.XmlValidationErrors != null && e.XmlValidationErrors.Any(err => err is MissingXMLDocumentationForMethod)));
-            Assert.IsTrue(endpoints.Any(e => e.XmlValidationErrors != null && e.XmlValidationErrors.Any(err => err is MissingXMLExampleForParam)));
-            Assert.IsTrue(endpoints.Any(e => e.XmlValidationErrors != null && e.XmlValidationErrors.Any(err => err is RouteParamMissingFromMethod)));
+            Assert.IsTrue(endpoints.Any(e => e.XmlRouteValidationErrors != null));
+            Assert.IsTrue(endpoints.Any(e => e.XmlRouteValidationErrors.Any(err => err is MissingXMLExampleForParam)));
+            Assert.IsTrue(endpoints.Any(e => e.XmlRouteValidationErrors.Any(err => err is MissingXMLDocumentationForMethod)));
+            Assert.IsTrue(endpoints.Any(e => e.XmlRouteValidationErrors.Any(err => err is MissingXMLDocumentationForParam)));
+            Assert.IsTrue(endpoints.Any(e => e.XmlRouteValidationErrors.Any(err => err is RouteParamMissingFromMethod)));
+            Assert.IsTrue(endpoints.All(e => e.AllXmlValidationErrors != null));
+            Assert.IsTrue(endpoints.Any(e => e.AllXmlValidationErrors.Any(err => err is MissingXMLReturns)));
+            Assert.IsTrue(endpoints.Any(e => e.AllXmlValidationErrors.Any(err => err is MissingXMLParamDescription)));
+            Assert.IsTrue(endpoints.Any(e => e.AllXmlValidationErrors.Any(err => err is MissingXMLDocumentationForParam)));
+            Assert.IsTrue(endpoints.Any(e => e.AllXmlValidationErrors.Any(err => err is MissingXMLSummary)));
+            Assert.IsTrue(endpoints.Any(e => e.AllXmlValidationErrors.Any(err => err is MissingXMLDocumentationForMethod)));
+            Assert.IsTrue(endpoints.Any(e => e.AllXmlValidationErrors.Any(err => err is MissingXMLExampleForParam)));
+            Assert.IsTrue(endpoints.Any(e => e.AllXmlValidationErrors.Any(err => err is RouteParamMissingFromMethod)));
+            Assert.IsTrue(endpoints.Count(e => e.AllXmlValidationErrors.Any(err => err is MissingXMLExceptionDescription)) == 1);
+            Assert.IsTrue(endpoints.Count(e => e.AllXmlValidationErrors.Any(err => err is MissingXMLExceptionType)) == 1);
         }
     }
 }

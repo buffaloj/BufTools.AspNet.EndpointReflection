@@ -146,7 +146,7 @@ namespace Reflectamundo.TestWebApi.Controllers
         {
         }
         
-        [HttpHead("example/no_xmldocs_endpoint/{id}")]
+        [HttpHead("example/no_xmldocs/{id}")]
         public IActionResult EndpointWithNoXMLDocs(int id)
         {
             var response = new ExampleResponse { ReturnedId = id };
@@ -157,7 +157,7 @@ namespace Reflectamundo.TestWebApi.Controllers
         /// An endpoint with no XML for params
         /// </summary>
         /// <returns>A message!</returns>
-        [HttpOptions("example/no_xmldocs_endpoint")]
+        [HttpOptions("example/no_param_docs")]
         public IActionResult EndpointWithNoParamDocs(ExampleRequest request, [FromQuery] ExampleFilter filter)
         {
             var response = GetResponse(request, filter);
@@ -165,7 +165,7 @@ namespace Reflectamundo.TestWebApi.Controllers
         }
 
         /// <summary>
-        /// An endpoint with no XML for params
+        /// An endpoint with no XML example for param
         /// </summary>
         /// <param name="id">A request object</param>
         /// <returns>A message!</returns>
@@ -177,12 +177,77 @@ namespace Reflectamundo.TestWebApi.Controllers
         }
 
         /// <summary>
+        /// An endpoint with no XML for param
+        /// </summary>
+        /// <returns>A message!</returns>
+        [HttpOptions("example/no_param_xml/{id}")]
+        public IActionResult EndpointWithNoParamXML(int id)
+        {
+            var response = new ExampleResponse { ReturnedId = id };
+            return Ok(response);
+        }
+
+        /// <summary>
         /// An endpoint with missing route param
         /// </summary>
         /// <param name="id" example="5">A request object</param>
         /// <returns>A message!</returns>
         [HttpOptions("example/missing_route_param/{id}")]
-        public IActionResult EndpointWithNoParamExample()
+        public IActionResult EndpointWithNoRouteParam()
+        {
+            var response = new ExampleResponse { ReturnedId = 5 };
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// An endpoint with no returns XML
+        /// </summary>
+        /// <param name="id">A request object</param>
+        [HttpOptions("example/no_returns_xml/{id}")]
+        public IActionResult EndpointWithNoReturnsXml(int id)
+        {
+            var response = new ExampleResponse { ReturnedId = id };
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// An endpoint with no param description
+        /// </summary>
+        /// <param name="id"></param>
+        [HttpOptions("example/no_param_description/{id}")]
+        public IActionResult EndpointWithNoParamDescription(int id)
+        {
+            var response = new ExampleResponse { ReturnedId = id };
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="id"></param>
+        [HttpOptions("example/no_summary/{id}")]
+        public IActionResult EndpointWithNoSummary(int id)
+        {
+            var response = new ExampleResponse { ReturnedId = id };
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// An endpoint with no description on the exception
+        /// </summary>
+        /// <exception cref="ExampleRequest"></exception>
+        [HttpOptions("example/no_exception_description")]
+        public IActionResult EndpointWithNoExceptionDescription()
+        {
+            var response = new ExampleResponse { ReturnedId = 5 };
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// An endpoint with no exception type
+        /// </summary>
+        /// <exception cref="">It has a description</exception>
+        [HttpOptions("example/no_exception_description")]
+        public IActionResult EndpointWithNoExceptionType()
         {
             var response = new ExampleResponse { ReturnedId = 5 };
             return Ok(response);
