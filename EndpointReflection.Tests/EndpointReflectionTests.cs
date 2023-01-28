@@ -35,7 +35,6 @@ namespace Reflectamundo.Asp.Tests
             Assert.IsTrue(endpoints.Any(e => e.XmlRouteValidationErrors.Any(err => err is MissingXMLDocumentationForParam)));
             Assert.IsTrue(endpoints.Any(e => e.XmlRouteValidationErrors.Any(err => err is RouteParamMissingFromMethod)));
             Assert.IsTrue(endpoints.All(e => e.AllXmlValidationErrors != null));
-            Assert.IsTrue(endpoints.Any(e => e.AllXmlValidationErrors.Any(err => err is MissingXMLReturns)));
             Assert.IsTrue(endpoints.Any(e => e.AllXmlValidationErrors.Any(err => err is MissingXMLParamDescription)));
             Assert.IsTrue(endpoints.Any(e => e.AllXmlValidationErrors.Any(err => err is MissingXMLDocumentationForParam)));
             Assert.IsTrue(endpoints.Any(e => e.AllXmlValidationErrors.Any(err => err is MissingXMLSummary)));
