@@ -59,7 +59,7 @@ namespace BufTools.AspNet.EndpointReflection
 
         private static HttpEndpoint AddXmlData(this HttpEndpoint endpoint, MethodInfo methodInfo)
         {
-            var allErrors = new List<IReportError>();
+            var allErrors = new List<Exception>();
             endpoint.AllXmlValidationErrors = allErrors;
 
             var endpointParams = new List<EndpointParam>();
@@ -154,9 +154,9 @@ namespace BufTools.AspNet.EndpointReflection
             return ParamUsageTypes.Body;
         }
 
-        private static string ValidateAndBuildRouteFromXmlExamples(MethodInfo methodInfo, out List<IReportError> errors)
+        private static string ValidateAndBuildRouteFromXmlExamples(MethodInfo methodInfo, out List<Exception> errors)
         {
-            errors = new List<IReportError>();
+            errors = new List<Exception>();
 
             var route = BuildRoute(methodInfo);
             var paramInfo = methodInfo.GetParameters();

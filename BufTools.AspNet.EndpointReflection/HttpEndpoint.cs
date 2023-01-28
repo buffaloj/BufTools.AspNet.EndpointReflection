@@ -25,13 +25,13 @@ namespace BufTools.AspNet.EndpointReflection
         /// To construct an <see cref="ExampleRoute"/> from XML comments, there must be XML comments.  This collection lists the required XML comment data 
         /// </summary>
         /// <remarks>This error collection only deals with errors that must be dealt with to use the example route</remarks>
-        public IList<IReportError> XmlRouteValidationErrors { get; set; }
+        public IList<Exception> XmlRouteValidationErrors { get; set; }
 
         /// <summary>
         /// If XML comments are missing on an endpoint, this will list them.
         /// </summary>
         /// <remarks>This warning collection lists all missing XML data on the endpoint</remarks>
-        public IList<IReportError> AllXmlValidationErrors { get; set; }
+        public IList<Exception> AllXmlValidationErrors { get; set; }
 
         /// <summary>
         /// The HTTP verb the endpoint responds to
@@ -96,15 +96,8 @@ namespace BufTools.AspNet.EndpointReflection
         // Is IReportError good name?
         //   share errors with object mother?
 
-        // break test out into many
-
         // Change error to not be exceptions?
 
-        // how are params without attributes figured out by asp?
-
-        // does "Options(ExampleRequest request" find the body type without the [FromBody]tag?
-        // need specific check for this
-
-        // split error out from suggestion
+        // break test out into many
     }
 }
