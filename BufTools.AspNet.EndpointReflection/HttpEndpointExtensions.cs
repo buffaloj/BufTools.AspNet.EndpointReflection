@@ -1,10 +1,7 @@
 ﻿using BufTools.AspNet.EndpointReflection.Exceptions;
 using BufTools.AspNet.EndpointReflection.Extensions;
-using BufTools.AspNet.EndpointReflection.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
-using Microsoft.AspNetCore.Routing;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -12,7 +9,6 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 
 namespace BufTools.AspNet.EndpointReflection
