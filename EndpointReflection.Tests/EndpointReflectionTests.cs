@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using BufTools.AspNet.EndpointReflection;
 using BufTools.AspNet.EndpointReflection.Exceptions;
+using TestWebApi.Controllers;
 
 namespace Reflectamundo.Asp.Tests
 {
@@ -37,6 +38,10 @@ namespace Reflectamundo.Asp.Tests
             Assert.IsTrue(endpoints.Count(e => e.AllXmlValidationErrors.Any(err => err is MissingXMLExceptionDescription)) == 1);
             Assert.IsTrue(endpoints.Count(e => e.AllXmlValidationErrors.Any(err => err is MissingXMLExceptionType)) == 1);
             Assert.IsTrue(endpoints.Count(e => e.AllXmlValidationErrors.Any(err => err is MissingXMLReturnsDescription)) == 1);
+
+            Assert.IsTrue(endpoints.First(e => e.MethodName == nameof(ExampleController.GetWithTypeInUrl)).MethodParams.First().UseageType == ParamUsageTypes.Route);
+            Assert.IsTrue(endpoints.First(e => e.MethodName == nameof(ExampleController.GetById)).MethodParams.First().UseageType == ParamUsageTypes.Route);
+            Assert.IsTrue(endpoints.First(e => e.MethodName == nameof(ExampleController.Post)).MethodParams.First().UseageType == ParamUsageTypes.Body);
         }
 
         [TestMethod]

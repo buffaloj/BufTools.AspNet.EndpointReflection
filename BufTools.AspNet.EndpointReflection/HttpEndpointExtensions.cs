@@ -1,5 +1,6 @@
 ﻿using BufTools.AspNet.EndpointReflection.Exceptions;
 using BufTools.AspNet.EndpointReflection.Extensions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using System;
@@ -57,6 +58,12 @@ namespace BufTools.AspNet.EndpointReflection
             return endpoint;
         }
 
+        public static IEnumerable<string> ToRouteParams(this string route)
+        {
+            var regex = new Regex("{(.*?)}");
+            return regex.Matches(route).Select(p => p.Groups[1].Value.Replace(" ", "").Split(":").First());
+        }
+
         private static HttpEndpoint AddXmlData(this HttpEndpoint endpoint, MethodInfo methodInfo)
         {
             var allErrors = new List<Exception>();
@@ -66,8 +73,7 @@ namespace BufTools.AspNet.EndpointReflection
             endpoint.MethodParams = endpointParams;
 
             // Find missing route params
-            var regex = new Regex("{(.*?)}");
-            var routeParams = regex.Matches(endpoint.Route).Select(p => p.Groups[1].Value);
+            var routeParams = endpoint.Route.ToRouteParams();
             var missing = routeParams.Where(rp => !methodInfo.GetParameters().Any(p => p.Name == rp))
                                      .Select(rp => new RouteParamMissingFromMethod(rp, endpoint.Route, methodInfo));
             allErrors.AddRange(missing);
@@ -154,7 +160,8 @@ namespace BufTools.AspNet.EndpointReflection
             if (p.HasDefaultValue)// && p.DefaultValue == null )
                 return ParamUsageTypes.Query;
 
-            if (route.Contains("{" + p.Name + "}"))
+            var routeParams = route.ToRouteParams();
+            if (routeParams.Contains(p.Name))
                 return ParamUsageTypes.Route;
 
             return ParamUsageTypes.Body;

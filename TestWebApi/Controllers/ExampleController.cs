@@ -20,7 +20,7 @@ namespace TestWebApi.Controllers
         [ProducesResponseType(typeof(ExampleResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [HttpGet("example")]
-        public IActionResult Get([FromQuery] ExampleFilter filter)
+        public IActionResult GetWithFilter([FromQuery] ExampleFilter filter)
         {
             var response = GetResponse(null, filter);
             return Ok(response);
@@ -34,7 +34,21 @@ namespace TestWebApi.Controllers
         [ProducesResponseType(typeof(ExampleResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [HttpGet("example/{id}")]
-        public IActionResult Get(int id)
+        public IActionResult GetById(int id)
+        {
+            var response = new ExampleResponse { ReturnedId = id };
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// An example of a Get endpoint that returns a resource by id
+        /// </summary>
+        /// <param name="id" example="19">The id of the requested resource</param>
+        /// <returns>An <see cref="ExampleResponse"/></returns>
+        [ProducesResponseType(typeof(ExampleResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [HttpGet("examplewithtype/{id:int}")]
+        public IActionResult GetWithTypeInUrl(int id)
         {
             var response = new ExampleResponse { ReturnedId = id };
             return Ok(response);
@@ -187,6 +201,7 @@ namespace TestWebApi.Controllers
             return Ok(response);
         }
 
+#pragma warning disable 1572
         /// <summary>
         /// An endpoint with missing route param
         /// </summary>
@@ -198,6 +213,7 @@ namespace TestWebApi.Controllers
             var response = new ExampleResponse { ReturnedId = 5 };
             return Ok(response);
         }
+#pragma warning restore 1572
 
         /// <summary>
         /// An endpoint with no returns XML
@@ -246,6 +262,8 @@ namespace TestWebApi.Controllers
             return Ok(response);
         }
 
+#pragma warning disable 1584
+#pragma warning disable 1658
         /// <summary>
         /// An endpoint with no description on the exception
         /// </summary>
@@ -257,6 +275,8 @@ namespace TestWebApi.Controllers
             var response = new ExampleResponse { ReturnedId = 5 };
             return Ok(response);
         }
+#pragma warning restore 1658
+#pragma warning restore 1584
 
         /// <summary>
         /// An endpoint with no description on the exception
