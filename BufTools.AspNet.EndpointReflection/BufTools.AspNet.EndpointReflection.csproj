@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
@@ -22,8 +22,8 @@ Provides:
     <PackageIcon>icon.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <Version>1.1.0</Version>
-    <PackageReleaseNotes>Expanded the data collected on each endpoint and added validation services.</PackageReleaseNotes>
+    <Version>1.2.0</Version>
+    <PackageReleaseNotes>Fixed handling of route params with type included. ie, get/{id:int}</PackageReleaseNotes>
     <PackageTags>swagger;endpoint;reflection;mstest;test;automation;endpointreflection;unittest;unit;asp;aspcore</PackageTags>
   </PropertyGroup>
 
