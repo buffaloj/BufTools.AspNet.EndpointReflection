@@ -47,6 +47,10 @@ Provides:
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\BufTools.Extensions\BufTools.Extensions.XmlComments\BufTools.Extensions.XmlComments.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="Resources\ProjectResources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

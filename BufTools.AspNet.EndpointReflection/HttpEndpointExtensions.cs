@@ -1,6 +1,4 @@
 ﻿using BufTools.AspNet.EndpointReflection.Exceptions;
-using BufTools.AspNet.EndpointReflection.Extensions;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using System;
@@ -11,6 +9,7 @@ using System.Net;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using BufTools.Extensions.XmlComments;
 
 namespace BufTools.AspNet.EndpointReflection
 {
