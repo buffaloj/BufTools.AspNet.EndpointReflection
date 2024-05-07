@@ -11,8 +11,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestWebApi", "TestWebApi\Te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestWebApiNoXml", "TestWebApiNoXml\TestWebApiNoXml.csproj", "{8344CF61-C17F-433E-B667-187A671ECE07}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BufTools.Extensions.Reflection", "..\BufTools.Extensions\BufTools.Extensions.Reflection\BufTools.Extensions.Reflection.csproj", "{C1CC0B90-F528-4701-99A1-0EB7A96E2838}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,10 +33,6 @@ Global
 		{8344CF61-C17F-433E-B667-187A671ECE07}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8344CF61-C17F-433E-B667-187A671ECE07}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8344CF61-C17F-433E-B667-187A671ECE07}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C1CC0B90-F528-4701-99A1-0EB7A96E2838}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C1CC0B90-F528-4701-99A1-0EB7A96E2838}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C1CC0B90-F528-4701-99A1-0EB7A96E2838}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C1CC0B90-F528-4701-99A1-0EB7A96E2838}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -16,15 +16,17 @@ Provides:
 - XML comments
 - Validation of XML comments with suggestions on how to fix errors
 </Description>
-    <Copyright>Copyright (c) Jeremy Shull, 2023</Copyright>
+    <Copyright>Copyright (c) Jeremy Shull, 2024</Copyright>
     <PackageProjectUrl>https://github.com/buffaloj/BufTools.AspNet.EndpointReflection</PackageProjectUrl>
     <RepositoryUrl>https://github.com/buffaloj/BufTools.AspNet.EndpointReflection</RepositoryUrl>
     <PackageIcon>icon.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <Version>1.2.0</Version>
+    <Version>2.0.0</Version>
     <PackageReleaseNotes>Fixed handling of route params with type included. ie, get/{id:int}</PackageReleaseNotes>
     <PackageTags>swagger;endpoint;reflection;mstest;test;automation;endpointreflection;unittest;unit;asp;aspcore</PackageTags>
+    <AssemblyVersion>2.0.0</AssemblyVersion>
+    <FileVersion>2.0.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -43,11 +45,8 @@ Provides:
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="BufTools.Extensions.XmlComments" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\BufTools.Extensions\BufTools.Extensions.XmlComments\BufTools.Extensions.XmlComments.csproj" />
   </ItemGroup>
 
   <ItemGroup>
